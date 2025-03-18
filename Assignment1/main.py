@@ -1,17 +1,10 @@
+from datetime import datetime
+
 import pandas as pd
 from apyori import apriori
 
-class Dataset:
-    def __init__(self, csv_path):
-        self.df = pd.read_csv(csv_path, parse_dates=["InvoiceDate"])
-        self.stock_code_to_description = self.df.groupby("StockCode").agg({"Description": "first"}).to_dict()["Description"]
-        self.csv_path = csv_path
+from dataset import Dataset
 
-    def get_grouped_data(self, group, data_item):
-        orders_depending_on_invoice = self.df.groupby(group)[data_item].apply(lambda x: list(set(x))).tolist()
-        return orders_depending_on_invoice
-        orders_depending_on_Country = df.groupby("Invoice")["Country"].apply(list)
-        orders_depending_on_Date = df.groupby("Invoice")["Country"].apply(list)
 
 def print_association_results(association_results):
     results = []
@@ -41,7 +34,14 @@ def print_association_results(association_results):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
+    pd.set_option('display.max_colwidth', None)  # Show full content in each column
+    pd.set_option('display.expand_frame_repr', False)  # Prevent line wrapping for large DataFrames
     dataset = Dataset("retail.csv")
+    dataset.handle_missing_or_wrong_values()
+    dataset.categorize_data()
+    print(dataset.df)
+    exit(0)
+
 
     print("=== products often bought tougher ===")
     orders_depending_on_invoice = dataset.get_grouped_data("Invoice", "StockCode")

@@ -1,0 +1,49 @@
+import pandas as pd
+from apyori import apriori
+
+
+def categorize_time(dt):
+    hour = dt.hour
+    if 6 <= hour < 11:
+        return 'Morning'
+    elif 12 <= hour < 17:
+        return 'Noon'
+    else:
+        return 'Evening'
+
+class Dataset:
+    def __init__(self, csv_path):
+        self.df = pd.read_csv(csv_path, parse_dates=["InvoiceDate"])
+        self.stock_code_to_description = self.df.groupby("StockCode").agg({"Description": "first"}).to_dict()["Description"]
+        self.csv_path = csv_path
+
+    def get_grouped_data(self, group, data_item):
+        orders_depending_on_invoice = self.df.groupby(group)[data_item].apply(lambda x: list(set(x))).tolist()
+        return orders_depending_on_invoice
+        orders_depending_on_Country = df.groupby("Invoice")["Country"].apply(list)
+        orders_depending_on_Date = df.groupby("Invoice")["Country"].apply(list)
+
+    def handle_missing_or_wrong_values(self):
+        #remove empty rows
+        self.df = self.df[self.df["Invoice"] != ""]
+        self.df = self.df[ self.df["StockCode"] != ""]
+        self.df = self.df[self.df["Description"] != ""]
+        self.df = self.df[self.df["Quantity"] != ""]
+        self.df = self.df[self.df["InvoiceDate"] != ""]
+        self.df = self.df[self.df["Price"] != ""]
+        self.df = self.df[self.df["Customer ID"] != ""]
+        self.df = self.df[self.df["Country"] != ""]
+
+        self.df = self.df[self.df["InvoiceDate"] < pd.Timestamp('today')]#remove purchases in the future
+        self.df = self.df[self.df.Invoice.str.isnumeric()]#remove all Invoices that are not numbers
+        self.df = self.df[self.df.StockCode.str.isnumeric()]#remove all StockCodes that are not numbers
+        self.df = self.df[pd.to_numeric(self.df.Price, errors='coerce').notnull()]
+        self.df["Customer ID"] = pd.to_numeric(self.df["Customer ID"], errors="raise", downcast='integer')
+        self.df = self.df[pd.to_numeric(self.df["Customer ID"], errors='coerce', downcast='integer').notnull()]
+        self.df = self.df[self.df.duplicated(subset=["StockCode", "Description"], keep=False)]#remove inconsistent row between stockcode and description
+
+    def categorize_data(self):
+        date_categories = ["morning", "noon", "afternoon", "evening", "night"]
+        unit_price_categories = ["cheap", "normal", "expensive", "extremely_expensive"]
+        quantity_categories = ["one", "multiple", "lot"]
+        self.df['InvoiceDateCat'] = self.df['InvoiceDate'].apply(categorize_time)
