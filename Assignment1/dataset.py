@@ -5,10 +5,10 @@ from apyori import apriori
 
 def categorize_time(dt: pd.Timestamp):
     hour = dt.hour
-
-    day_type = "week_day"
-    if dt.day_of_week == 5 or dt.day_of_week == 6:
-        day_type = "weekend_day"
+    day_type = ""
+    # day_type = "week_day"
+    # if dt.day_of_week == 5 or dt.day_of_week == 6:
+    #     day_type = "weekend_day"
     if 0 <= hour < 6:
         return f'time:00:00-5:59 [{day_type}]'
     elif 6 <= hour < 12:
@@ -62,6 +62,8 @@ class Dataset:
         unit_price_categories = ["cheap", "normal", "expensive", "extremely_expensive"]
         quantity_categories = ["one", "multiple", "lot"]
         self.df['InvoiceDateCat'] = self.df['InvoiceDate'].apply(categorize_time)
+        self.df['quantityCat'] = pd.qcut(self.df['Quantity'], 3, labels=["small", "normal", "many"])
+        self.df['priceCat'] = pd.qcut(self.df['Price'], 4, labels=["cheap", "normal", "expensive", "extremely_expensive"])
 
     def keep_last_x_items(self,x):
         self.df = self.df.sort_values('InvoiceDate').tail(x)
