@@ -97,12 +97,13 @@ if __name__ == '__main__':
 
     exit(0)
     print("=== products bought at certain time moments ===")
-    grouped_baskets = dataset.df.groupby(['InvoiceDateCat', 'StockCode']).size().reset_index(name='Count')
+    grouped_baskets = dataset.df.groupby('InvoiceDateCat')['Country'].apply(list).tolist()
 
     print(grouped_baskets)
     print("Grouped data")
-    association_results = list(apriori(grouped_baskets, min_support=0.02, min_confidence=0.5, min_lift=2))
+    association_results = list(apriori(grouped_baskets, min_support=0.20, min_confidence=0.9, min_lift=2, max_length=3))
     print_association_results(association_results, dataset.df)
+
     # exit(0)
     # print()
     # print("=== Simular clients ===")

@@ -2,6 +2,8 @@ import pandas
 import pandas as pd
 from apyori import apriori
 
+def categorize_month(dt: pd.Timestamp):
+    return dt.month
 
 def categorize_time(dt: pd.Timestamp):
     hour = dt.hour
@@ -64,6 +66,7 @@ class Dataset:
         self.df['InvoiceDateCat'] = self.df['InvoiceDate'].apply(categorize_time)
         self.df['quantityCat'] = pd.qcut(self.df['Quantity'], 3, labels=["small", "normal", "many"])
         self.df['priceCat'] = pd.qcut(self.df['Price'], 4, labels=["cheap", "normal", "expensive", "extremely_expensive"])
+        self.df['Month'] = self.df['InvoiceDate'].apply(categorize_month)
 
     def keep_last_x_items(self,x):
         self.df = self.df.sort_values('InvoiceDate').tail(x)
