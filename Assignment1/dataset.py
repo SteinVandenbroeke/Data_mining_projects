@@ -37,8 +37,6 @@ class Dataset:
     def get_grouped_data(self, group, data_item):
         orders_depending_on_invoice = self.df.groupby(group)[data_item].apply(lambda x: list(set(x))).tolist()
         return orders_depending_on_invoice
-        orders_depending_on_Country = df.groupby("Invoice")["Country"].apply(list)
-        orders_depending_on_Date = df.groupby("Invoice")["Country"].apply(list)
 
     def handle_missing_or_wrong_values(self):
         #remove empty rows
