@@ -65,14 +65,6 @@ colum_combinations = {
     ]
 }
 
-all_columns_except_target = [col for col in df.columns if col != "target"]
-
-columns_combinations = [["curricular_units_1st_sem_grade_rounded", "curricular_units_1st_sem_evaluations",
-                         "curricular_units_1st_sem_approved",
-                         "curricular_units_2nd_sem_grade_rounded", "curricular_units_2nd_sem_evaluations",
-                         "curricular_units_2nd_sem_approved",
-                         "course", "previous_qualification", "special_needs"], all_columns_except_target]
-
 classifier_test_framework = ClassifierTestFramework(df, colum_combinations)
 
 classifier_test_framework.add_classifier("DecisionTree", tree.DecisionTreeClassifier())
@@ -82,15 +74,16 @@ for i in range(1,20,5):
     ))
 classifier_test_framework.add_classifier("Naive_bayes", GaussianNB())
 for i in range(1,50,5):
-    classifier_test_framework.add_classifier(f"Ensemble_method_{i}", RandomForestClassifier())
+    classifier_test_framework.add_classifier(f"Random_forest_{i}", RandomForestClassifier())
 
-for i in [5, 10, 15]:
-    classifier_test_framework.add_classifier(f"RF_SelectKBest_{i}", Pipeline(
-        steps=[
-            ("select", SelectKBest(score_func=f_classif, k=10)),
-            ("clf", RandomForestClassifier(n_estimators=10))
-        ]
-    ))
+
+# for i in [5, 10, 15]:
+#     classifier_test_framework.add_classifier(f"RF_SelectKBest_{i}", Pipeline(
+#         steps=[
+#             ("select", SelectKBest(score_func=f_classif, k=10)),
+#             ("clf", RandomForestClassifier(n_estimators=10))
+#         ]
+#     ))
 
 for key, items in classifier_test_framework.get_results().items():
     print(f"==={key}===")
